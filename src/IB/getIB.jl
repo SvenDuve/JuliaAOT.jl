@@ -5,6 +5,7 @@ using RCall
 @rlibrary IBrokers
 ## run TimeSeries
 using TimeSeries
+using DataFrames
 
 
 symbol = "GBL"
@@ -42,6 +43,38 @@ function getIB(symbol, exch, expiry, currency, barSize, duration)
 
 
 end
+
+
+
+
+function getIB2(symbol, endDateTime, exch, expiry, currency, barSize, duration)
+
+
+    #RCall for IBrokers
+    R"""
+    contract <- twsFuture(symbol = $symbol, exch = $exch , expiry = $expiry, currency = $currency)
+    data <- reqHistoricalData(tws, contract, endDateTime = $endDateTime, barSize = $barSize, duration = $duration)['T08:00/T18:00']
+    """
+
+    #jData DataFrame, with timestamps first
+    jData = DataFrame(TimeStamp = rcopy(R"index(as.xts(data))"))
+
+    #colnames for Julia DataFrame
+    cNames = ["Open", "High", "Low", "Close", "Volume", "WAP", "hasGaps", "Count"]
+
+
+    for i in 1:length(cNames)
+
+        # iterate through the return array of R and combine with initial DataFrame
+        jData[Symbol(cNames[i])] = rcopy(R"data")[:,i]
+
+    end
+
+    return jData
+
+end
+
+
 
 
 

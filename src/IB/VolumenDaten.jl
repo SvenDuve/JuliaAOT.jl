@@ -17,8 +17,46 @@ histogram(daten["Volume"].values)
 
 
 
+# To try/ to do
+# find a way to first sort the volume and then get the array index of the top 20/ 4 volumes
+# try to rename the x axis with strings of the timestamps,
+# try and redude the background grid so that you can navigate through the graph
 
-daten2 = getIB("GBL", "DTB", "201809", "EUR", "5 mins", "1 M")
+# working like this perhaps avoids writing it to a CSV file.
+
+
+symbol = "GBL"
+exch = "DTB"
+expiry = "201809"
+currency = "EUR"
+duration = "14 D"
+barSize = "30 mins"
+
+
+getConnectIB()
+
+#can also do this, perhaps right a funciton with default end TimeArray, which then is the real getIB
+
+endTime = "20180724 18:00:00"
+
+datenSatz = getIB2(symbol, "20180725 18:00:00", exch, expiry, currency, barSize, duration)
+
+
+
+
+using Plots
+pyplot()
+
+
+plot(datenSatz[:TimeStamp], datenSatz[:Close])
+plot!(datenSatz[:TimeStamp][5:10], datenSatz[:Open][5:10])
+
+
+
+names(datenSatz)
+
+
+
 
 quantile(daten2["Volume"].values, 0.9)
 mean(daten2["Volume"].values)
